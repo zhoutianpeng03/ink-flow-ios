@@ -9,6 +9,16 @@ import SwiftUI
 
 @main
 struct ink_flow_iosApp: App {
+    
+    init() {
+        // TEMPORARY: Reset app data to clean up duplicate records
+        // Remove this line after the issue is resolved
+        AppInitializer.shared.resetAppData()
+        
+        // Initialize app on startup
+        AppInitializer.shared.initializeApp()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimelineView: View {
     let dateGroups: [(String, [Note])]
+    let onNoteSelected: (Note) -> Void
     
     var body: some View {
         ScrollView {
@@ -20,7 +21,8 @@ struct TimelineView: View {
                         dateKey: dateKey,
                         notes: notes,
                         isFirst: index == 0,
-                        isLast: index == dateGroups.count - 1
+                        isLast: index == dateGroups.count - 1,
+                        onNoteSelected: onNoteSelected
                     )
                 }
             }
@@ -36,6 +38,8 @@ struct TimelineView: View {
         Note(emoji: "💡", title: "Project Ideas", content: "Some brilliant ideas came up during brainstorming session about user experience improvements.", startTime: Date().addingTimeInterval(-3600), endTime: Date().addingTimeInterval(-1800))
     ]
     
-    TimelineView(dateGroups: [("Today", sampleNotes)])
-        .background(Color.black)
+    TimelineView(dateGroups: [("Today", sampleNotes)]) { note in
+        print("Selected note: \(note.title)")
+    }
+    .background(Color.black)
 }

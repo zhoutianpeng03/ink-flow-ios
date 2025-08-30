@@ -11,6 +11,12 @@ struct ChatView: View {
     @StateObject private var viewModel = ChatViewModel()
     @FocusState private var isInputFocused: Bool
     
+    private var isSendDisabled: Bool {
+        viewModel.currentMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        viewModel.isLoading ||
+        viewModel.isStreaming
+    }
+    
     var body: some View {
         ZStack {
             // Background
@@ -73,6 +79,12 @@ struct ChatView: View {
                             }
                         }
                     }
+                    .onChange(of: viewModel.isStreaming) { isStreaming in
+                        // Keep scrolling to bottom during streaming
+                        if isStreaming, let lastMessage = viewModel.messages.last {
+                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                        }
+                    }
                 }
                 
                 // Input area
@@ -99,9 +111,9 @@ struct ChatView: View {
                         }) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(viewModel.currentMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.white.opacity(0.3) : Color.white)
+                                .foregroundColor(isSendDisabled ? Color.white.opacity(0.3) : Color.white)
                         }
-                        .disabled(viewModel.currentMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(isSendDisabled)
                     }
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)

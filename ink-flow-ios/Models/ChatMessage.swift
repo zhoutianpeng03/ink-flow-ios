@@ -18,4 +18,10 @@ struct ChatMessage: Identifiable, Codable {
         self.isFromUser = isFromUser
         self.timestamp = Date()
     }
+    
+    init(content: String, isFromUser: Bool, timestamp: Date) {
+        self.content = content
+        self.isFromUser = isFromUser
+        self.timestamp = timestamp
+    }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct DirectNoteEditor: View {
     @ObservedObject var note: Note
     @State private var isKeyboardVisible = false
+    @Environment(\.dismiss) private var dismiss
     
     // 计算标题（第一行内容）
     private var noteTitle: String {
@@ -24,6 +25,17 @@ struct DirectNoteEditor: View {
         VStack(spacing: 0) {
             // 标题栏
             HStack {
+                // Back button
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+                
+                Spacer()
+                
                 Text(noteTitle)
                     .font(.headline)
                     .foregroundColor(.white)
@@ -31,10 +43,16 @@ struct DirectNoteEditor: View {
                 
                 Spacer()
                 
+                // Date or placeholder for balance
                 if !note.content.isEmpty {
                     Text(note.formattedDate)
                         .font(.caption2)
                         .foregroundColor(.gray)
+                } else {
+                    // Invisible placeholder for balance
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .opacity(0)
                 }
             }
             .padding(.horizontal, 16)

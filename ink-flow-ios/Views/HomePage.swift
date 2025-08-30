@@ -11,6 +11,8 @@ struct HomePage: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var showCreateNoteSheet = false
     @State private var refreshTrigger = UUID()
+    @State private var selectedNote: Note?
+    @State private var showNoteEditor = false
     
     var body: some View {
         NavigationView {
@@ -20,8 +22,12 @@ struct HomePage: View {
                     .ignoresSafeArea()
                 
                 // Main content - Timeline
-                TimelineView(dateGroups: viewModel.dateGroups)
-                    .id(refreshTrigger)
+                TimelineView(dateGroups: viewModel.dateGroups) { note in
+                    // Handle note selection
+                    selectedNote = note
+                    showNoteEditor = true
+                }
+                .id(refreshTrigger)
                 
                 // Floating add button (bottom right)
                 VStack {
@@ -72,9 +78,21 @@ struct HomePage: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     refreshTrigger = UUID()
                 }
+                // Navigate to editor after creation
+                selectedNote = note
+                showNoteEditor = true
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showNoteEditor) {
+            if let note = selectedNote {
+                NavigationView {
+                    DirectNoteEditor(note: note)
+                        .navigationBarHidden(true)
+                }
+                .navigationViewStyle(StackNavigationViewStyle())
+            }
         }
     }
 }

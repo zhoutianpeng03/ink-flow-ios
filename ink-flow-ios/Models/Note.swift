@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 // MARK: - Main Note Class (ObservableObject for SwiftUI reactivity)
-class Note: ObservableObject, Identifiable {
+class Note: ObservableObject, Identifiable, Codable {
     let id: UUID
     @Published var emoji: String
     @Published var title: String
@@ -99,6 +99,52 @@ class Note: ObservableObject, Identifiable {
         self._content = content
         self._filePath = noteRecord.filePath
         self._summary = noteRecord.summary
+    }
+    
+    /// Required initializer for Codable support
+    required convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        let id = try container.decode(UUID.self, forKey: .id)
+        let emoji = try container.decode(String.self, forKey: .emoji)
+        let title = try container.decode(String.self, forKey: .title)
+        let startTime = try container.decode(Date.self, forKey: .startTime)
+        let endTime = try container.decode(Date.self, forKey: .endTime)
+        let createdAt = try container.decode(Date.self, forKey: .createdAt)
+        let modifiedAt = try container.decode(Date.self, forKey: .modifiedAt)
+        let content = try container.decodeIfPresent(String.self, forKey: ._content)
+        let filePath = try container.decodeIfPresent(String.self, forKey: ._filePath)
+        let summary = try container.decodeIfPresent(String.self, forKey: ._summary)
+        
+        self.init(id: id, emoji: emoji, title: title, content: content ?? "", startTime: startTime, endTime: endTime)
+        self.createdAt = createdAt
+        self.modifiedAt = modifiedAt
+        self._filePath = filePath
+        self._summary = summary
+    }
+    
+    // MARK: - Codable Keys
+    private enum CodingKeys: String, CodingKey {
+        case id, emoji, title, startTime, endTime, createdAt, modifiedAt
+        case _content = "content"
+        case _filePath = "filePath"
+        case _summary = "summary"
+    }
+    
+    /// Encode method for Codable support
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(id, forKey: .id)
+        try container.encode(emoji, forKey: .emoji)
+        try container.encode(title, forKey: .title)
+        try container.encode(startTime, forKey: .startTime)
+        try container.encode(endTime, forKey: .endTime)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(modifiedAt, forKey: .modifiedAt)
+        try container.encodeIfPresent(_content, forKey: ._content)
+        try container.encodeIfPresent(_filePath, forKey: ._filePath)
+        try container.encodeIfPresent(_summary, forKey: ._summary)
     }
     
     // MARK: - Update Methods
@@ -208,15 +254,6 @@ class Note: ObservableObject, Identifiable {
     }
 }
 
-// MARK: - Codable Support
-extension Note: Codable {
-    private enum CodingKeys: String, CodingKey {
-        case id, emoji, title, startTime, endTime, createdAt, modifiedAt
-        case _content = "content"
-        case _filePath = "filePath"
-        case _summary = "summary"
-    }
-}
 
 // MARK: - Sample Data
 extension Note {

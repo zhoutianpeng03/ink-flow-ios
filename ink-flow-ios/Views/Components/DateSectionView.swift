@@ -12,6 +12,7 @@ struct DateSectionView: View {
     let notes: [Note]
     let isFirst: Bool
     let isLast: Bool
+    let onNoteSelected: (Note) -> Void
     
     private var displayDate: String {
         if let firstNote = notes.first {
@@ -63,7 +64,12 @@ struct DateSectionView: View {
             // Right content - notes list (aligned with timeline)
             VStack(spacing: 16) {
                 ForEach(notes) { note in
-                    NoteCell(note: note)
+                    Button(action: {
+                        onNoteSelected(note)
+                    }) {
+                        NoteCell(note: note)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             .padding(.trailing, 16)
@@ -83,6 +89,8 @@ struct DateSectionView: View {
         notes: sampleNotes,
         isFirst: true,
         isLast: false
-    )
+    ) { note in
+        print("Selected note: \(note.title)")
+    }
     .background(Color.black)
 }

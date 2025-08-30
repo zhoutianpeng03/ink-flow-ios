@@ -22,6 +22,12 @@ struct ink_flow_iosApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-        }
-    }
+    @StateObject private var mainNote = Note(title: "", content: "")
+    
+    // var body: some Scene {
+    //     WindowGroup {
+    //         DirectNoteEditor(note: mainNote)
+    //             .preferredColorScheme(.dark)
+    //     }
+    // }
 }
